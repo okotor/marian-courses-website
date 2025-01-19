@@ -1,0 +1,28 @@
+<%- include("partials/header.ejs") %>
+
+<h1>Register a User</h1>
+
+  <form action="/register" method="POST">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <label for="height">Height:</label>
+      <input type="range" id="height" name="height" min="120" max="250" step="1" required> 
+      <span id="heightValue">185</span> cm<br><br>
+      <label for="birthdate">Birthdate:</label>
+      <input type="date" id="birthdate" name="birthdate" required><br><br>
+      <button type="submit" value="Register a User">Register</button>
+  </form>
+
+<script> 
+const heightSlider = document.getElementById('height'); 
+const heightValue = document.getElementById('heightValue');
+heightSlider.addEventListener('input', function() {
+    heightValue.textContent = heightSlider.value; 
+}); 
+</script>
+
+<%- include("partials/footer.ejs") %>

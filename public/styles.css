@@ -1,0 +1,122 @@
+html, body {
+    font-size: 15px;
+    text-align: center;
+    color: black;
+    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), 
+                url("images/background_landscape.jpg");
+    font-family : Helvetica, sans-serif; 
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+    background-position: center center; /* Center the image horizontally and vertically */
+    background-size: contain; /* Adjust the image to fit within its container without cropping */
+    height: 100vh; /* Ensure the body takes up the full height of the viewport */
+    margin: 0; /* Remove default margins */
+}
+
+a {
+    font-family: Arial, sans-serif; /* Specify font family */
+    font-size: 2rem; /* Specify font size */
+    text-decoration: none; /* Remove underline */
+    margin: 0 10px
+}
+
+h1, h2, h3{ 
+    background-color : transparent; 
+    font-size: 4rem;
+    font-family : Helvetica, sans-serif; 
+}
+
+h5{ 
+    background-color : transparent; 
+    color: #000000;
+    font-family : Helvetica, sans-serif; 
+}
+
+p[enlarged-text]{ 
+    font-size: 2rem;
+}
+
+.container{
+    background-color: yellow; 
+    border: 2x solid black;
+    background-color: transparent;
+    margin-left : auto; 
+    margin-right : auto;
+    height: auto;
+    overflow: auto;
+}
+
+.header {
+    position: fixed; /* Fix the header at the top */
+    top: 0; /* Align it to the top */
+    left: 0; /* Align it to the left */
+    width: 100%; /* Make it span the full width */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Align child elements vertically */
+    padding: 10px 20px;
+    color: #000000;
+    height: 60px; /* Ensure consistent header height */
+    z-index: 1000; /* Ensure the header stays above other content */
+}
+
+header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 20px;
+    color: #000000;
+}
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+nav ul li {
+    margin: 0 15px;
+}
+nav ul li a {
+    text-decoration: none;
+    color: #000000;
+    font-size: 16px;
+    z-index: 1100; /* Ensure links are above the header */
+    position: relative; /* Make z-index work */
+}
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-left: 20px;
+    position: relative;
+    z-index: 1100;
+}
+.actions button {
+    padding: 5px 15px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    font-size: 14px;
+}
+.actions button:hover {
+    background-color: #f0f0f0;
+}
+
+footer {
+    position: fixed; /* Fix the footer to the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%; /* Optional: Footer background color */
+    text-align: center;
+    padding: 10px 0; /* Optional padding */
+}
+
+.button{
+    background-color: rgb(229, 230, 215);
+    color: black;
+    border: 5px solid black;
+    margin: 5px;
+    padding:10px;
+    display: inline-block; /* Ensure it wraps tightly around the text */
+    cursor: pointer; /* Optional: Change cursor to pointer when hovering */
+    text-align: center; /* Optional: Center the text inside */
+    }

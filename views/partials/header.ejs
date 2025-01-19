@@ -1,0 +1,44 @@
+<!DOCTYPE html> 
+<html>
+
+    <head> 
+    <meta charset="UTF-8">
+    <link href="styles.css" rel="stylesheet">
+    <title>The God Bless Webpage</title>
+    </head> 
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/course-calendar">Course Calendar</a></li>
+                </ul>
+            </nav>
+            <div class="actions">
+                <button class="login">Login</button>
+                <button class="register">Register</button>
+            </div>
+        </header>
+        
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        // Select buttons
+        const loginButton = document.querySelector(".login");
+        const registerButton = document.querySelector(".register");
+    
+        // Add click event for login button
+        loginButton.addEventListener("click", () => {
+            window.location.href = "/login"; // Redirect to the login page
+        });
+    
+        // Add click event for register button
+        registerButton.addEventListener("click", () => {
+            window.location.href = "/register"; // Redirect to the register page
+        });
+    });
+    </script>
+    
+            
+
+          
