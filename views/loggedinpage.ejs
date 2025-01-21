@@ -1,5 +1,7 @@
 <%- include("partials/header.ejs") %>
 
-<h1>Welcome!<h1>
+<% if (locals.reportedUsername) { %>
+    <h2>Welcome, <%= reportedUsername %>!</h2>
+<% } %>
 
 <%- include("partials/footer.ejs") %>

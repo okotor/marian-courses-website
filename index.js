@@ -1,6 +1,11 @@
-import express from "express";
+import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
+import express from "express";
 import pg from "pg";
+
+const app = express();
+const port = 5000;
+const saltRounds = 10;
 
 const { Pool } = pg;
 const db = new pg.Pool({
@@ -10,9 +15,6 @@ const db = new pg.Pool({
   password: "123456",
   port: 5432,
 });
-
-const app = express();
-const port = 5000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -33,9 +35,10 @@ async function loadAllDBData() {
 
 app.get("/", async (req, res) => {
   users_db_data = await loadAllDBData();
+  console.log(users_db_data.length)
   res.render("index.ejs", {
-    confirmRegistration: heading,
     userData: users_db_data,
+    confirmRegistration: null, // Ensure confirmRegistration is always passed
   });
 });
 
@@ -53,98 +56,123 @@ app.get("/register", (req, res) => {
 
 app.post("/register", async (req, res) => {
   const desiredUsername = req.body.username
-  const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [
-    desiredUsername,
-  ]);
-
-  // Database data insertion
-  if (checkResult.rows.length > 0) {
-    res.send("Username already exists. Try logging in.");
-  } else {
+  const desiredPassword = req.body.password
   try {
-    const result = await db.query(
-      'INSERT INTO users (id, username, email, password, height, birthdate) VALUES ($1, $2, $3, $4, $5, $6)',
-          [users_db_data.length + 1,
-            desiredUsername,
-            req.body.email,
-            req.body.password,
-            req.body.height,
-            req.body.birthdate
-          ]
-        ); 
-    heading = `${desiredUsername}, you have been
-       successfully registered!`;
+    const checkResult = await db.query("SELECT * FROM users WHERE username = $1", [
+      desiredUsername,
+    ]);
+
+    if (checkResult.rows.length > 0) {
+      res.send("Username already exists. Try logging in.");
+    // Database data insertion
+    } else {
+      //Password Hashing
+      bcrypt.hash(desiredPassword, saltRounds, async (err, hash) => {
+        if (err) {
+          console.log("Error hashing password:", err);
+        } else {
+          const result = await db.query(
+            'INSERT INTO users (username, email, password, height, birthdate) VALUES ($1, $2, $3, $4, $5)',
+                [desiredUsername,
+                  req.body.email,
+                  hash,
+                  req.body.height,
+                  req.body.birthdate
+                ]
+              ); 
+          heading = `${desiredUsername}, you have been
+            successfully registered!`;
+          res.render("index.ejs", {confirmRegistration: heading});
+        };
+      });
+    }
   } catch (err) {
     console.error('Error inserting data:', err);
-   }
-  res.redirect("/loggedinpage");
-  console.log(users_db_data[users_db_data.length]);
-  }
+  }  
 });
 
 app.post("/login", async (req, res) => {
-  const username = req.body.username
-  const password = req.body.password
-  console.log(username);
-  console.log(password);
-});
+  const reportedUsername = req.body.username
+  const attemptedPassword = req.body.password
 
-app.post("/submit", async (req, res) => {
-  // Check if the username is unique & less than 25 characters
-  const desiredUsername = req.body["username"];
-  const existingUser = users_db_data.find(
-    user => user.username === desiredUsername
-  );
-  if (existingUser) {
-    console.log("Username is already taken, try a different one.");
-    return res.render("index.ejs", {
-    confirmRegistration: null,
-    userData: users_db_data,
-    error: "Username is already taken, try a different one." 
-  });
-  } 
-  // Check if the username is less than 25 characters 
-  if (desiredUsername.length > 25) {
-    console.log("Username must be less than 25 characters.");
-    return res.render("index.ejs", {
-      confirmRegistration: null,
-      userData: users_db_data,
-      error: "Username must be less than 25 characters." 
-    }); 
-  }
-  // Database data insertion
   try {
-    const result = await db.query(
-      'INSERT INTO users (id, username, sex, height, birthdate) VALUES ($1, $2, $3, $4, $5)',
-          [users_db_data.length + 1,
-            desiredUsername,
-            req.body.sex,
-            req.body.height,
-            req.body.birthdate
-          ]
-        ); 
-    heading = `${desiredUsername}, you have been
-       successfully registered!`;
-  } catch (err) {
-    console.error('Error inserting data:', err);
-   }
-  res.redirect("/");
-  console.log(users_db_data[users_db_data.length]);
+    const checkUsername = await db.query("SELECT * FROM users WHERE username = $1", [
+    reportedUsername,
+  ]);
+    if (checkUsername.rows.length > 0) {
+      const user = checkUsername.rows[0];
+      const storedPassword = user.password;
 
-  // // Saving form data in USERS list
-  // const { username, sex, height, birthdate } = req.body;
-  // // Add a new user to the array
-  // const newUser = {
-  //   id: users_db_data.length + 1, // Incremental ID
-  //   username: username,
-  //   sex: sex,
-  //   height: height,
-  //   birthdate: birthdate,
-  // };
-  // users_db_data.push(newUser);
-  // heading = `${username}, you have been
-  //      successfully temporarily registered!`;
+      if (attemptedPassword === storedPassword) {
+        res.render("loggedinpage.ejs", {reportedUsername});
+      } else {
+        res.send("Incorrect Password");
+      }
+    // Database data insertion
+    } else {
+      res.send("User not found!");
+    }
+  } catch (err) {
+  console.error('Error inserting data:', err);
+ }
 });
+
+// app.post("/submit", async (req, res) => {
+//   // Check if the username is unique & less than 25 characters
+//   const desiredUsername = req.body["username"];
+//   const existingUser = users_db_data.find(
+//     user => user.username === desiredUsername
+//   );
+//   if (existingUser) {
+//     console.log("Username is already taken, try a different one.");
+//     return res.render("index.ejs", {
+//     confirmRegistration: null,
+//     userData: users_db_data,
+//     error: "Username is already taken, try a different one." 
+//   });
+//   } 
+//   // Check if the username is less than 25 characters 
+//   if (desiredUsername.length > 25) {
+//     console.log("Username must be less than 25 characters.");
+//     return res.render("index.ejs", {
+//       confirmRegistration: null,
+//       userData: users_db_data,
+//       error: "Username must be less than 25 characters." 
+//     }); 
+//   }
+//   // Database data insertion
+//   try {
+//     const result = await db.query(
+//       'INSERT INTO users (username, sex, height, birthdate) VALUES ($1, $2, $3, $4, $5)',
+//           [users_db_data.length + 1,
+//             desiredUsername,
+//             req.body.sex,
+//             req.body.height,
+//             req.body.birthdate
+//           ]
+//         ); 
+//     heading = `${desiredUsername}, you have been
+//        successfully registered!`;
+//   } catch (err) {
+//     console.error('Error inserting data:', err);
+//    }
+//   res.redirect("/");
+//   console.log(users_db_data[users_db_data.length]);
+
+//   // // Saving form data in USERS list
+//   // const { username, sex, height, birthdate } = req.body;
+//   // // Add a new user to the array
+//   // const newUser = {
+//   //   id: users_db_data.length + 1, // Incremental ID
+//   //   username: username,
+//   //   sex: sex,
+//   //   height: height,
+//   //   birthdate: birthdate,
+//   // };
+//   // users_db_data.push(newUser);
+//   // heading = `${username}, you have been
+//   //      successfully temporarily registered!`;
+// });
 
 
 // PUT method here (replace user data)
@@ -158,38 +186,3 @@ app.post("/submit", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-// var users = [
-//   {
-//     id: 1,
-//     username:
-//       "Jeshuillo",
-//     sex: "male",
-//     height: "250",
-//     birthdate: "0014-12-25",
-//   },
-//   {
-//     id: 2,
-//     username:
-//       "Immaculillo",
-//     sex: "female",
-//     height: "249",
-//     birthdate: "0000-12-08",
-//   },
-//   {
-//     id: 3,
-//     username:
-//       "Tomadillo",
-//     sex: "male",
-//     height: "193",
-//     birthdate: "1913-02-13",
-//   },
-//   {
-//     id: 4,
-//     userame:
-//       "Marumillo",
-//     sex: "female",
-//     height: "173",
-//     birthdate: "2002-11-29",
-//   }
-// ];
