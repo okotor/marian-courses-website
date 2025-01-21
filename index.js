@@ -45,15 +45,21 @@ let heading;
 
 
 app.get("/", (req, res) => {
-  res.render("index.ejs");
+  res.render("index.ejs", {
+    user: req.user
+  });
 });
 
 app.get("/login", (req, res) => {
-  res.render("login.ejs");
+  res.render("login.ejs", {
+    user: req.user
+  });
 });
 
 app.get("/register", (req, res) => {
-  res.render("register.ejs");
+  res.render("register.ejs", {
+    user: req.user
+  });
 });
 
 app.get("/logout", (req, res) => {
@@ -69,7 +75,8 @@ app.get("/loggedinpage", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("loggedinpage.ejs", {
       reportedUsername: req.user.username, 
-      confirmRegistration: heading,         
+      confirmRegistration: heading,
+      user: req.user,         
     });
   } else {
     res.redirect("/login");
@@ -90,6 +97,16 @@ app.get(
     failureRedirect: "/login",
   })
 );
+
+app.get("/auth/status", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ authenticated: true,
+      username: req.user.username 
+      });
+  } else {
+    res.json({ authenticated: false });
+  }
+});
 
 app.post(
   "/login",
@@ -191,7 +208,6 @@ passport.use(
     }, 
     async (accessToken, refreshToken, profile, cb) => {
       try {
-        console.log(profile);
         const result = await db.query("SELECT * FROM users WHERE email = $1", [
           profile.email,
         ]);

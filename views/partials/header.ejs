@@ -13,11 +13,18 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="/about">About</a></li>
                     <li><a href="/course-calendar">Course Calendar</a></li>
+                    <% if (user) { %>
+                        <li><a href="/loggedinpage">My Courses</a></li>
+                    <% } %>
                 </ul>
             </nav>
             <div class="actions">
-                <button class="login">Login</button>
-                <button class="register">Register</button>
+                <% if (user) { %>
+                    <button class="logout">Logout</button>
+                <% } else { %>
+                    <button class="login">Login</button>
+                    <button class="register">Register</button>
+                <% } %>
             </div>
         </header>
         
