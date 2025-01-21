@@ -43,30 +43,26 @@ db.connect();
 
 let heading;
 
+app.use((req, res, next) => {
+  res.locals.user = req.user || null; // Pass the user object or null if not authenticated
+  next();
+});
 
 app.get("/", (req, res) => {
-  res.render("index.ejs", {
-    user: req.user
-  });
+  res.render("index.ejs");
 });
 
 app.get("/login", (req, res) => {
-  res.render("login.ejs", {
-    user: req.user
-  });
+  res.render("login.ejs");
 });
 
 // Make it work
 app.get("/adminlogin", (req, res) => {
-  res.render("adminlogin.ejs", {
-    user: req.user
-  });
+  res.render("adminlogin.ejs");
 });
 
 app.get("/register", (req, res) => {
-  res.render("register.ejs", {
-    user: req.user
-  });
+  res.render("register.ejs");
 });
 
 app.get("/logout", (req, res) => {
@@ -82,8 +78,7 @@ app.get("/loggedinpage", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("loggedinpage.ejs", {
       reportedUsername: req.user.username, 
-      confirmRegistration: heading,
-      user: req.user,         
+      confirmRegistration: heading,         
     });
   } else {
     res.redirect("/login");
@@ -95,8 +90,7 @@ app.get("/adminloggedin", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("adminloggedin.ejs", {
       adminUsername: req.user.username, 
-      confirmRegistration: heading,
-      user: req.user,         
+      confirmRegistration: heading,        
     });
   } else {
     res.redirect("/login");
@@ -133,6 +127,14 @@ app.post(
   passport.authenticate("local", {
     successRedirect: "/loggedinpage",
     failureRedirect: "/login",
+  })
+);
+
+app.post(
+  "/adminlogin",
+  passport.authenticate("adminlocal", {
+    successRedirect: "/adminloggedin",
+    failureRedirect: "/adminlogin",
   })
 );
 
@@ -211,6 +213,38 @@ passport.use(
     // Database data insertion
     } else {
       return cb("User not found.");
+    }
+  } catch (err) {
+    return cb(err);
+  }  
+  })
+);
+
+passport.use(
+  "adminlocal",
+  new Strategy(async function verify(admin_username, admin_password, cb) {
+  try {
+    const checkAdminUsername = await db.query("SELECT * FROM admins WHERE admin_username = $1", [
+      admin_username,
+    ]);
+    if (checkAdminUsername.rows.length > 0) {
+      const user = checkAdminUsername.rows[0];
+      const storedHashedAdminPassword = user.admin_password;
+      bcrypt.compare(admin_password, storedHashedAdminPassword, (err, valid) => {
+        if (err) {
+          console.error("Error comparing passwords:", err);
+          return cb(err);
+        } else {
+          if (valid) {
+            return cb(null, user);
+          } else {
+            return cb(null, false);
+          }
+        }
+      })
+    // Database data insertion
+    } else {
+      return cb("Admin not found.");
     }
   } catch (err) {
     return cb(err);
