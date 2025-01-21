@@ -1,0 +1,9 @@
+<%- include("partials/header.ejs") %>
+
+<% if (adminUsername) { %>
+    <h2>Welcome, <%= adminUsername %>!</h2>
+<% } %>
+
+<a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
+
+<%- include("partials/footer.ejs") %>

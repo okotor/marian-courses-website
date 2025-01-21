@@ -56,6 +56,13 @@ app.get("/login", (req, res) => {
   });
 });
 
+// Make it work
+app.get("/adminlogin", (req, res) => {
+  res.render("adminlogin.ejs", {
+    user: req.user
+  });
+});
+
 app.get("/register", (req, res) => {
   res.render("register.ejs", {
     user: req.user
@@ -75,6 +82,19 @@ app.get("/loggedinpage", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("loggedinpage.ejs", {
       reportedUsername: req.user.username, 
+      confirmRegistration: heading,
+      user: req.user,         
+    });
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// Make it work
+app.get("/adminloggedin", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render("adminloggedin.ejs", {
+      adminUsername: req.user.username, 
       confirmRegistration: heading,
       user: req.user,         
     });
@@ -164,7 +184,8 @@ app.post("/register", async (req, res) => {
 
 // DELETE method here
 // 1. logic
-// 2. alert box asking "Are you sure?"
+// 2. alert box asking "Are you sure?"¨
+
 passport.use(
   "local",
   new Strategy(async function verify(username, password, cb) {
