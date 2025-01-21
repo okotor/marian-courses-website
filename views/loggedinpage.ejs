@@ -1,7 +1,12 @@
 <%- include("partials/header.ejs") %>
 
-<% if (locals.reportedUsername) { %>
+<% if (reportedUsername) { %>
     <h2>Welcome, <%= reportedUsername %>!</h2>
+<% } %>
+
+<% if (confirmRegistration) { %>
+    <% console.log("confirmed"); %>
+    <h2><%= confirmRegistration %></h2>
 <% } %>
 
 <%- include("partials/footer.ejs") %>
