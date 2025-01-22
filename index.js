@@ -45,6 +45,7 @@ let heading;
 
 app.use((req, res, next) => {
   res.locals.user = req.user || null; // Pass the user object or null if not authenticated
+  res.locals.isAdmin = req.user?.isAdmin || false; // Add isAdmin for template use
   next();
 });
 
@@ -236,7 +237,7 @@ passport.use(
           return cb(err);
         } else {
           if (valid) {
-            return cb(null, user);
+            return cb(null, {user, isAdmin: true});
           } else {
             return cb(null, false);
           }

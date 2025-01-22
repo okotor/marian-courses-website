@@ -10,12 +10,24 @@
         <header>
             <nav>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/course-calendar">Course Calendar</a></li>
-                    <% if (user) { %>
+                    <% if (user && user.isAdmin) { %>
+                        <!-- Admin-specific menu -->
+                        <li><a href="/posts">Posts</a></li>
+                        <li><a href="/courses">Courses</a></li>
+                        <li><a href="/events">Events</a></li>
+                        <li><a href="/calendar">Calendar</a></li>
+                      <% } else if (user) { %>
+                        <!-- Regular user menu -->
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/course-calendar">Course Calendar</a></li>
                         <li><a href="/loggedinpage">My Courses</a></li>
-                    <% } %>
+                      <% } else { %>
+                        <!-- Guest menu (optional) -->
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/course-calendar">Course Calendar</a></li>
+                      <% } %>    
                 </ul>
             </nav>
             <div class="actions">
